@@ -189,7 +189,7 @@
   ul.hist::-webkit-scrollbar{width:6px}
   ul.hist::-webkit-scrollbar-thumb{background:rgba(214,180,235,.7);border-radius:9px}
   li.item{
-    display:flex;align-items:center;gap:11px;padding:11px 12px;margin-bottom:9px;
+    display:flex;flex-wrap:wrap;align-items:center;gap:11px;padding:11px 12px;margin-bottom:9px;
     border-radius:16px;background:rgba(255,255,255,.66);
     border:1px solid rgba(255,255,255,.9);
     box-shadow:0 6px 16px rgba(190,150,215,.14);
@@ -210,6 +210,15 @@
     cursor:pointer;padding:6px 8px;border-radius:10px;transition:.16s;
   }
   .undo:hover{background:rgba(255,190,226,.35);color:#E0659B}
+  li.item .itemSide{margin-left:auto;display:flex;gap:6px;align-items:center;flex:none}
+  li.item .addMsg{
+    flex:none;border:1px solid rgba(226,196,240,.9);background:rgba(255,255,255,.85);
+    padding:5px 9px;border-radius:10px;cursor:pointer;font:700 11.5px/1 inherit;letter-spacing:.03em;
+    color:#B27AD8;white-space:nowrap;transition:.16s;
+  }
+  li.item .addMsg:hover{background:rgba(255,190,226,.35);color:#E0659B}
+  li.item .msg,li.item .msgInput,li.item .msgs{width:100%;margin-left:21px}
+  li.item .msgInput{margin-left:21px;margin-top:8px}
   .empty{text-align:center;color:var(--ink-soft);font-size:13px;padding:26px 0 20px;letter-spacing:.06em}
 
   .quick button,.primary,.ghost,.undo,input[type=number],.dialog button{touch-action:manipulation}
@@ -324,8 +333,49 @@
   .dialog p{margin:0 0 18px;font-size:13px;color:var(--ink-soft);line-height:1.7}
   .dialog .btns{display:flex;gap:10px}
   .dialog .btns button{flex:1;padding:11px 0;border-radius:14px;cursor:pointer;font:700 14px/1 inherit}
-  .dialog .cancel{background:rgba(255,255,255,.9);border:1px solid rgba(226,196,240,.9);color:var(--ink-soft)}
-  .dialog .ok{border:0;color:#fff;background:linear-gradient(135deg,#FF9ECF,#B58BFF);box-shadow:0 8px 20px rgba(200,140,225,.4)}
+  .prog{margin-top:14px;padding:0 4px;text-align:left}
+  .progBar{
+    position:relative;height:10px;border-radius:999px;overflow:hidden;
+    background:rgba(240,218,237,.75);
+    box-shadow:inset 0 1px 3px rgba(180,140,200,.2);
+  }
+  .progFill{
+    position:absolute;left:0;top:0;bottom:0;width:0%;border-radius:inherit;
+    background:linear-gradient(90deg,#FFD98A,#FF9ECF 50%,#B58BFF);
+    box-shadow:0 0 12px rgba(255,180,220,.7);
+    transition:width .5s cubic-bezier(.2,.9,.3,1);
+  }
+  .progInfo{display:flex;justify-content:space-between;margin-top:6px;font-size:11.5px;letter-spacing:.02em;color:#B08BD0}
+  .progInfo #progPct{font-weight:800;color:#D36FB4;background:linear-gradient(100deg,#FFB84D,#FF8FCB 55%,#B58BFF);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+  /* ---------- 对话气泡 ---------- */
+  li.item .msgs{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+  li.item .msg{
+    position:relative;align-self:flex-start;max-width:100%;padding:8px 12px;
+    border-radius:14px 14px 14px 4px;background:linear-gradient(145deg,#FFF6FB,#FBEFFF);
+    border:1px solid rgba(235,210,245,.9);font-size:12.5px;line-height:1.7;color:#6E4E82;
+    box-shadow:0 2px 6px rgba(200,140,225,.12);
+  }
+  li.item .msg .mt{display:block;font-size:10.5px;color:#C499DC;margin-bottom:3px;letter-spacing:.03em}
+  li.item .msg .bt{
+    display:inline-block;margin-top:4px;padding:3px 8px;font-size:10.5px;font-weight:700;
+    color:#B27AD8;background:rgba(255,255,255,.85);border-radius:8px;border:1px solid rgba(235,210,245,.9);
+    cursor:pointer;letter-spacing:.03em;
+  }
+  li.item .msgInput{display:flex;gap:6px;margin-top:8px}
+  li.item .msgInput textarea{
+    flex:1;resize:none;border:1px solid rgba(226,196,240,.9);border-radius:12px;padding:8px 10px;
+    font:inherit;font-size:12.5px;color:#6E4E82;background:rgba(255,255,255,.9);min-height:38px;max-height:110px;
+    box-shadow:0 2px 6px rgba(200,140,225,.08);outline:none;
+  }
+  li.item .msgInput textarea:focus{border-color:#D08BED;box-shadow:0 0 0 3px rgba(214,140,235,.18)}
+  li.item .msgInput button{
+    border:0;border-radius:12px;padding:0 12px;font:800 12px/1 inherit;letter-spacing:.06em;
+    color:#fff;background:linear-gradient(135deg,#FF9ECF,#B58BFF);
+    box-shadow:0 6px 14px rgba(190,140,225,.34);cursor:pointer;
+  }
+  li.item.showCompose .msgInput{display:flex}
+  li.item:not(.showCompose) .msgInput{display:none}
 
   /* ---------- 手机竖屏（放在最后，确保覆盖基础样式） ---------- */
   @media (max-width:860px){
@@ -473,6 +523,14 @@
       <div class="counter" id="counter">
         <span class="num" id="remainNum">600</span><span class="unit">颗</span>
         <div class="total">瓶中共 <span id="totalNum">600</span> 颗 · 已取走 <span id="takenNum">0</span> 颗</div>
+        <!-- 进度条 -->
+        <div class="prog">
+          <div class="progBar"><div class="progFill" id="progFill"></div></div>
+          <div class="progInfo">
+            <span id="progPct">0%</span>
+            <span id="progTip">距离清空瓶子还差 600 颗 ✧</span>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -562,7 +620,10 @@
       if(!d || !Array.isArray(d.history)) return null;
       return {
         total: TOTAL,
-        history: d.history.filter(e => e && typeof e.amount === "number"),
+        history: d.history.filter(e => e && typeof e.amount === "number").map(function(e){
+          if(!Array.isArray(e.messages)) e.messages = [];
+          return e;
+        }),
         eggs: Array.isArray(d.eggs) ? d.eggs.filter(e => e && typeof e.text === "string") : []
       };
     }catch(e){ return null; }
@@ -723,6 +784,9 @@
     totalNum: document.getElementById("totalNum"),
     takenNum: document.getElementById("takenNum"),
     counter: document.getElementById("counter"),
+    progFill: document.getElementById("progFill"),
+    progPct: document.getElementById("progPct"),
+    progTip: document.getElementById("progTip"),
     amount: document.getElementById("amount"),
     quick: document.getElementById("quick"),
     takeBtn: document.getElementById("takeBtn"),
@@ -803,9 +867,18 @@
 
   function renderInfo(){
     const rem = remaining();
+    const taken = takenTotal();
     el.remainNum.textContent = rem;
     el.totalNum.textContent = state.total;
-    el.takenNum.textContent = takenTotal();
+    el.takenNum.textContent = taken;
+
+    // 进度条
+    const pct = state.total ? Math.round(taken / state.total * 100) : 0;
+    el.progFill.style.width = pct + "%";
+    el.progPct.textContent = pct + "%";
+    if(rem === 0) el.progTip.textContent = "瓶子清空啦 ✧ 所有星星都去到了它们该去的地方";
+    else if(taken === 0) el.progTip.textContent = "距离清空瓶子还差 " + rem + " 颗 ✧";
+    else el.progTip.textContent = "已取走 " + taken + " 颗 · 还差 " + rem + " 颗清空 ✧";
 
     el.amount.max = rem || 0;
     if(rem <= 0){
@@ -836,14 +909,33 @@
     state.history.slice().sort((a,b)=> a.ts - b.ts).forEach(function(e){
       run = Math.max(0, run - e.amount);
       map[e.id] = run;
+      if(!Array.isArray(e.messages)) e.messages = [];
     });
     let buf = "";
     state.history.slice().sort((a,b)=> b.ts - a.ts).forEach(function(e){
-      buf += '<li class="item">'
+      let msgsBuf = "";
+      e.messages.slice().sort((a,b)=> a.ts - b.ts).forEach(function(m){
+        msgsBuf += '<div class="msg">'
+                 + '<span class="mt">' + fmtTime(m.ts) + '</span>'
+                 + esc(m.text)
+                 + '</div>';
+      });
+      buf += '<li class="item" data-id="' + e.id + '">'
            + '<span class="dot"></span>'
            + '<span class="info"><span class="t">' + fmtTime(e.ts) + '</span>'
-           + '<div class="a">取走 <b>' + e.amount + '</b> 颗 · 剩余 ' + map[e.id] + ' 颗</div></span>'
+           + '<div class="a">取走 <b>' + e.amount + '</b> 颗 · 剩余 ' + map[e.id] + ' 颗</div>';
+      if(msgsBuf){
+        buf += '<div class="msgs">' + msgsBuf + '</div>';
+      }
+      buf += '</span>'
+           + '<div class="itemSide">'
            + '<button class="undo" data-id="' + e.id + '">撤销</button>'
+           + '<button class="ghost addMsg" data-id="' + e.id + '">+' + (e.messages.length ? " 继续写" : " 写点什么") + '</button>'
+           + '</div>'
+           + '<div class="msgInput">'
+           + '<textarea placeholder="当时的心情、碎碎念、或者想感谢自己的一句话…"></textarea>'
+           + '<button type="button" data-id="' + e.id + '">发送</button>'
+           + '</div>'
            + '</li>';
     });
     el.hist.innerHTML = buf;
@@ -872,17 +964,25 @@
   }
 
   /* ---------- 彩蛋弹层 ---------- */
-  function openEgg(egg, amount){
+  let _pendingHistId = null;
+  function openEgg(egg, amount, histId){
+    _pendingHistId = histId || null;
     el.eggCat.textContent = EGG_CATS[egg.c];
     el.eggText.textContent = egg.t;
     el.eggMeta.textContent = fmtTime(Date.now()) + " · 取走 " + amount + " 颗";
     el.eggMask.classList.add("open");
   }
-  el.eggOk.addEventListener("click", function(){
+  function closeEgg(){
     el.eggMask.classList.remove("open");
-  });
+    if(_pendingHistId){
+      const id = _pendingHistId;
+      _pendingHistId = null;
+      setTimeout(function(){ requestQuickMessage(id); }, 80);
+    }
+  }
+  el.eggOk.addEventListener("click", closeEgg);
   el.eggMask.addEventListener("click", function(ev){
-    if(ev.target === el.eggMask) el.eggMask.classList.remove("open");
+    if(ev.target === el.eggMask) closeEgg();
   });
 
   /* ---------- 记录分类切换 ---------- */
@@ -944,7 +1044,7 @@
     const egg = drawEgg();
     const ts = Date.now();
     const base = ts + "_" + Math.floor(Math.random()*10000);
-    state.history.push({ id: "s" + base, ts: ts, amount: n });
+    state.history.push({ id: "s" + base, ts: ts, amount: n, messages: [] });
     state.eggs.push({ id: "e" + base, ts: ts, c: egg.c, t: egg.t, amount: n });
     save();
     el.amount.value = "";
@@ -955,7 +1055,7 @@
     renderAll(true);
     shake();
     flyTip(n);
-    openEgg(egg, n);
+    openEgg(egg, n, "s" + base);
   }
 
   function undo(id){
@@ -1000,9 +1100,63 @@
   });
 
   el.hist.addEventListener("click", function(ev){
-    const b = ev.target.closest(".undo");
-    if(b) undo(b.dataset.id);
+    // 撤销
+    const undoBtn = ev.target.closest(".undo");
+    if(undoBtn){ undo(undoBtn.dataset.id); return; }
+    // 展开/收起继续写
+    const addBtn = ev.target.closest(".addMsg");
+    if(addBtn){
+      const li = addBtn.closest(".item");
+      li.classList.toggle("showCompose");
+      if(li.classList.contains("showCompose")){
+        const ta = li.querySelector(".msgInput textarea");
+        setTimeout(function(){ ta.focus(); ta.select(); }, 30);
+      }
+      return;
+    }
+    // 发送气泡
+    const sendBtn = ev.target.closest(".msgInput button");
+    if(sendBtn){
+      const li = sendBtn.closest(".item");
+      const ta = li.querySelector(".msgInput textarea");
+      const txt = (ta.value || "").trim();
+      if(txt) appendMessage(sendBtn.dataset.id, txt);
+      ta.value = "";
+      li.classList.remove("showCompose");
+      return;
+    }
   });
+  // 气泡输入框快捷键：Ctrl+Enter 发送，Esc 收起
+  el.hist.addEventListener("keydown", function(ev){
+    const ta = ev.target.closest(".msgInput textarea");
+    if(!ta) return;
+    if((ev.ctrlKey || ev.metaKey) && ev.key === "Enter"){
+      const li = ta.closest(".item");
+      const btn = li.querySelector(".msgInput button");
+      const txt = (ta.value || "").trim();
+      if(txt){ ev.preventDefault(); appendMessage(btn.dataset.id, txt); ta.value = ""; li.classList.remove("showCompose"); }
+    }else if(ev.key === "Escape"){
+      ta.closest(".item").classList.remove("showCompose");
+    }
+  });
+
+  function appendMessage(histId, text){
+    const h = state.history.find(function(e){ return e.id === histId; });
+    if(!h) return;
+    if(!Array.isArray(h.messages)) h.messages = [];
+    h.messages.push({ id: "m" + Date.now() + Math.floor(Math.random()*10000), ts: Date.now(), text: text });
+    save();
+    renderHistory();
+  }
+
+  function requestQuickMessage(histId){
+    // 先找到那条记录的 li
+    const li = el.hist.querySelector('.item[data-id="' + histId + '"]');
+    if(!li) return;
+    li.classList.add("showCompose");
+    const ta = li.querySelector(".msgInput textarea");
+    setTimeout(function(){ ta.focus(); }, 40);
+  }
 
   el.takeBtn.addEventListener("animationend", function(){ el.takeBtn.disabled = false; });
 
