@@ -1,0 +1,1159 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FFF1F8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="星愿瓶">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="format-detection" content="telephone=no">
+<title>✨ 星愿玻璃瓶</title>
+<style>
+  :root{
+    --pink:#FFC7E5;
+    --pink-deep:#FF8FCB;
+    --lav:#CDB4FF;
+    --lav-deep:#A98BFF;
+    --gold:#FFD98A;
+    --ink:#6B4A63;
+    --ink-soft:#9A7C93;
+    --card:rgba(255,255,255,.56);
+    --line:rgba(255,255,255,.85);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",ui-rounded,"Segoe UI",system-ui,sans-serif;
+    color:var(--ink);
+    -webkit-text-size-adjust:100%;
+    background:
+      radial-gradient(1200px 800px at 12% 8%, rgba(255,214,236,.85), transparent 60%),
+      radial-gradient(900px 700px at 88% 12%, rgba(214,199,255,.75), transparent 62%),
+      radial-gradient(1000px 900px at 50% 100%, rgba(255,240,213,.85), transparent 60%),
+      linear-gradient(165deg,#FFF4FA 0%,#F7EEFF 46%,#EFF5FF 100%);
+    background-attachment:fixed;
+    min-height:100%;
+    overflow-x:hidden;
+  }
+  /* ---------- 背景光斑 ---------- */
+  .bokeh{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+  .bokeh i{
+    position:absolute;border-radius:50%;
+    background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.95), rgba(255,255,255,0) 68%);
+    animation:float 16s ease-in-out infinite;
+    opacity:.55;
+  }
+  @keyframes float{
+    0%,100%{transform:translate3d(0,0,0) scale(1)}
+    50%{transform:translate3d(12px,-26px,0) scale(1.12)}
+  }
+  /* ---------- 布局 ---------- */
+  .wrap{
+    position:relative;z-index:1;max-width:1060px;margin:0 auto;
+    padding:calc(26px + env(safe-area-inset-top)) calc(18px + env(safe-area-inset-right))
+            calc(40px + env(safe-area-inset-bottom)) calc(18px + env(safe-area-inset-left));
+  }
+  header{text-align:center;margin-bottom:22px}
+  h1{
+    margin:0;font-size:clamp(24px,4.4vw,38px);letter-spacing:.06em;font-weight:700;
+    background:linear-gradient(92deg,#FF8FCB,#C08BFF 45%,#FFC46B);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    text-shadow:0 6px 22px rgba(255,163,214,.35);
+    animation:titleGlow 5s ease-in-out infinite;
+  }
+  @keyframes titleGlow{
+    0%,100%{filter:drop-shadow(0 0 0 rgba(255,196,107,0))}
+    50%{filter:drop-shadow(0 0 12px rgba(255,196,107,.5))}
+  }
+  .sub{margin:8px 0 0;font-size:13.5px;color:var(--ink-soft);letter-spacing:.08em}
+  .panel{
+    display:grid;grid-template-columns:minmax(300px,1fr) minmax(320px,1.05fr);
+    gap:26px;align-items:stretch;
+  }
+  @media (max-width:860px){
+    .panel{grid-template-columns:1fr;gap:14px}
+  }
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:28px;
+    box-shadow:0 22px 55px rgba(190,146,214,.22), inset 0 1px 0 rgba(255,255,255,.9);
+    backdrop-filter:blur(16px) saturate(120%);
+    -webkit-backdrop-filter:blur(16px) saturate(120%);
+  }
+  /* ---------- 瓶子 ---------- */
+  .bottle-area{
+    position:relative;display:flex;flex-direction:column;align-items:center;
+    padding:16px 10px 22px;
+  }
+  .bottle{width:min(78vw,330px);height:auto;filter:drop-shadow(0 24px 30px rgba(176,140,205,.28))}
+  /* 矮屏（笔记本/小窗口）压缩高度，让剩余颗数尽量落在首屏 */
+  @media (max-height:820px) and (min-width:861px){
+    .wrap{padding:16px 20px 36px}
+    header{margin-bottom:12px}
+    .bottle{width:min(32vh,278px)}
+  }
+  .bottle.wobble{animation:wobble .62s ease}
+  @keyframes wobble{
+    0%{transform:rotate(0)}18%{transform:rotate(-2.2deg)}38%{transform:rotate(1.7deg)}
+    58%{transform:rotate(-1.1deg)}78%{transform:rotate(.6deg)}100%{transform:rotate(0)}
+  }
+  .star{animation-name:twinkle;animation-iteration-count:infinite;animation-timing-function:ease-in-out}
+  @keyframes twinkle{0%,100%{opacity:.62}50%{opacity:1}}
+  @keyframes spark{
+    0%,100%{opacity:0;transform:scale(.3) rotate(0deg)}
+    50%{opacity:.95;transform:scale(1) rotate(45deg)}
+  }
+
+  .counter{margin-top:6px;text-align:center;position:relative}
+  .counter .num{
+    font-size:clamp(40px,8vw,58px);font-weight:800;line-height:1;letter-spacing:.02em;
+    background:linear-gradient(100deg,#FFB84D,#FF8FCB 55%,#B58BFF);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 4px 14px rgba(255,160,205,.5));
+    display:inline-block;
+  }
+  .counter .num.pop{animation:pop .55s cubic-bezier(.2,1.6,.4,1)}
+  @keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.22)}100%{transform:scale(1)}}
+  .counter .unit{font-size:16px;margin-left:6px;color:var(--ink-soft);font-weight:600}
+  .counter .total{margin-top:6px;font-size:12.5px;color:var(--ink-soft);letter-spacing:.1em}
+  .floatTip{
+    position:absolute;left:50%;top:10px;transform:translateX(-50%);
+    font-weight:800;font-size:20px;color:#FF7FC4;pointer-events:none;
+    text-shadow:0 2px 10px rgba(255,255,255,.9);
+    animation:flyUp 1.15s ease-out forwards;
+  }
+  @keyframes flyUp{
+    0%{opacity:0;transform:translate(-50%,14px) scale(.7)}
+    25%{opacity:1}
+    100%{opacity:0;transform:translate(-50%,-64px) scale(1.15)}
+  }
+  /* ---------- 控制区 ---------- */
+  .side{display:flex;flex-direction:column;gap:18px}
+  .card.pad{padding:20px 20px 18px}
+  .card h2{
+    margin:0 0 14px;font-size:15px;letter-spacing:.1em;color:var(--ink);
+    display:flex;align-items:center;gap:8px;font-weight:700;
+  }
+  .card h2::before{
+    content:"";width:9px;height:9px;border-radius:50%;
+    background:linear-gradient(135deg,#FFB3DE,#C4A2FF);
+    box-shadow:0 0 10px rgba(255,163,214,.9);
+  }
+  .quick{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+  .quick button{
+    flex:1 1 auto;min-width:52px;padding:9px 0;border-radius:14px;cursor:pointer;
+    font:600 14px/1 inherit;color:#A8559A;
+    background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(255,236,247,.9));
+    border:1px solid rgba(255,190,226,.9);
+    box-shadow:0 4px 12px rgba(255,170,215,.22);
+    transition:.18s;
+  }
+  .quick button:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(255,150,205,.32)}
+  .quick button.on{background:linear-gradient(135deg,#FFC0E2,#D9B8FF);color:#fff;border-color:transparent}
+  .row{display:flex;gap:10px;align-items:center}
+  input[type=number]{
+    width:100%;padding:12px 14px;border-radius:16px;font:600 16px/1 inherit;color:var(--ink);
+    background:rgba(255,255,255,.92);border:1px solid rgba(226,196,240,.9);
+    box-shadow:inset 0 2px 6px rgba(200,160,220,.14);outline:none;
+    -moz-appearance:textfield;appearance:textfield;
+  }
+  input[type=number]:focus{border-color:#FFA7D6;box-shadow:0 0 0 4px rgba(255,167,214,.22)}
+  input[type=number]::-webkit-outer-spin-button,
+  input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .primary{
+    padding:12px 20px;border:0;border-radius:16px;cursor:pointer;white-space:nowrap;
+    font:700 15px/1 inherit;color:#fff;letter-spacing:.06em;
+    background:linear-gradient(135deg,#FF9ECF 0%,#C79BFF 52%,#9CD3FF 100%);
+    background-size:180% 180%;
+    box-shadow:0 10px 24px rgba(206,140,224,.4), inset 0 1px 0 rgba(255,255,255,.6);
+    transition:.22s;
+  }
+  .primary:hover{background-position:100% 0;transform:translateY(-2px);box-shadow:0 14px 30px rgba(206,140,224,.5)}
+  .primary:active{transform:translateY(0)}
+  .primary:disabled{filter:grayscale(.35) opacity(.6);cursor:not-allowed;transform:none}
+  .hint{margin:12px 2px 0;font-size:12.5px;color:var(--ink-soft);min-height:16px;letter-spacing:.04em}
+  .hint.warn{color:#E0659B;font-weight:600}
+
+  .histHead{display:flex;align-items:center;justify-content:space-between}
+  .ghost{
+    background:transparent;border:1px solid rgba(214,180,235,.9);color:#9A7C93;
+    font:600 12px/1 inherit;padding:7px 12px;border-radius:12px;cursor:pointer;transition:.18s;
+  }
+  .ghost:hover{background:rgba(255,255,255,.8);color:#E0659B;border-color:#FFB8DE}
+  ul.hist{list-style:none;margin:0;padding:2px 2px 0;max-height:290px;overflow:auto;scrollbar-width:thin}
+  ul.hist::-webkit-scrollbar{width:6px}
+  ul.hist::-webkit-scrollbar-thumb{background:rgba(214,180,235,.7);border-radius:9px}
+  li.item{
+    display:flex;align-items:center;gap:11px;padding:11px 12px;margin-bottom:9px;
+    border-radius:16px;background:rgba(255,255,255,.66);
+    border:1px solid rgba(255,255,255,.9);
+    box-shadow:0 6px 16px rgba(190,150,215,.14);
+    animation:slideIn .34s ease both;
+  }
+  @keyframes slideIn{from{opacity:0;transform:translateY(-8px) scale(.98)}to{opacity:1;transform:none}}
+  li.item .dot{
+    width:10px;height:10px;border-radius:50%;flex:none;
+    background:radial-gradient(circle at 35% 35%,#FFF3B8,#FFB84D 70%);
+    box-shadow:0 0 10px rgba(255,184,77,.85);
+  }
+  li.item .info{flex:1;min-width:0}
+  li.item .t{font-size:12px;color:var(--ink-soft);letter-spacing:.03em}
+  li.item .a{font-size:13.5px;margin-top:3px;font-weight:600}
+  li.item .a b{color:#FF6FB8}
+  .undo{
+    flex:none;border:0;background:transparent;color:#B79BD0;font:600 12px/1 inherit;
+    cursor:pointer;padding:6px 8px;border-radius:10px;transition:.16s;
+  }
+  .undo:hover{background:rgba(255,190,226,.35);color:#E0659B}
+  .empty{text-align:center;color:var(--ink-soft);font-size:13px;padding:26px 0 20px;letter-spacing:.06em}
+
+  .quick button,.primary,.ghost,.undo,input[type=number],.dialog button{touch-action:manipulation}
+  .footRow{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px dashed rgba(214,180,235,.75)}
+  .footRow button{flex:1 1 auto}
+  .tip{margin:16px 4px 0;text-align:center;font-size:12.5px;color:var(--ink-soft);line-height:1.8}
+  .tip b{color:#C48BE0;font-weight:700}
+  .eggNote{
+    margin:10px 0 0;text-align:center;font-size:11.5px;letter-spacing:.05em;color:#C08BD6;
+    background:linear-gradient(100deg,#FFE6F5,#F1E6FF);
+    border:1px dashed rgba(214,180,235,.9);border-radius:12px;padding:7px 10px;
+  }
+  @media (min-width:861px){ .tip .onlyMobile{display:none} }
+  @media (max-width:860px){ .tip .onlyDesktop{display:none} }
+
+  /* ---------- 记录分类标签 ---------- */
+  .tabs{display:flex;gap:8px;margin:2px 0 12px}
+  .tab{
+    flex:1;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;
+    padding:9px 10px;border-radius:14px;font:700 13px/1 inherit;letter-spacing:.03em;
+    color:#B57FC8;background:rgba(255,255,255,.62);border:1px solid rgba(226,196,240,.9);
+    transition:.18s;touch-action:manipulation;
+  }
+  .tab i{
+    font-style:normal;font-size:11px;font-weight:800;color:#fff;padding:1px 6px;border-radius:9px;
+    background:linear-gradient(135deg,#FF9ECF,#B58BFF);min-width:18px;text-align:center;
+  }
+  .tab i:empty{display:none}
+  .tab.on{
+    color:#fff;border-color:transparent;
+    background:linear-gradient(135deg,#FFB6DC,#B58BFF);
+    box-shadow:0 8px 18px rgba(198,140,225,.4);
+  }
+
+  /* ---------- 彩蛋弹层 ---------- */
+  .eggMask{
+    position:fixed;inset:0;display:none;place-items:center;z-index:60;padding:20px;
+    background:rgba(120,86,128,.34);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);
+    animation:fade .22s ease;
+  }
+  .eggMask.open{display:grid}
+  .eggCard{
+    position:relative;width:min(92vw,392px);text-align:center;padding:18px 26px 26px;
+    border-radius:30px;overflow:hidden;
+    background:linear-gradient(165deg,#FFFFFF 0%,#FFF3FA 45%,#F6EEFF 100%);
+    border:1px solid rgba(255,255,255,.95);
+    box-shadow:0 30px 60px rgba(168,126,196,.34),0 0 0 1px rgba(255,214,236,.7) inset;
+    animation:eggIn .42s cubic-bezier(.2,.9,.3,1.3) both;
+  }
+  @keyframes eggIn{
+    0%{opacity:0;transform:translateY(22px) scale(.9)}
+    100%{opacity:1;transform:translateY(0) scale(1)}
+  }
+  .eggHalo{
+    position:relative;width:128px;height:128px;margin:0 auto;pointer-events:none;
+    background:radial-gradient(circle,rgba(255,225,150,.62),rgba(255,225,150,0) 68%);
+  }
+  .eggStar{width:84px;height:84px;display:block;margin:22px auto 0;
+    animation:eggSpin 7s linear infinite;
+    filter:drop-shadow(0 8px 18px rgba(255,190,110,.75));
+  }
+  @keyframes eggSpin{
+    0%{transform:rotate(0) scale(1)}
+    50%{transform:rotate(180deg) scale(1.08)}
+    100%{transform:rotate(360deg) scale(1)}
+  }
+  .eggTop{margin:12px 0 10px;font-size:12.5px;letter-spacing:.14em;color:#C08BD6}
+  .eggCat{
+    display:inline-block;padding:4px 14px;border-radius:999px;font-size:12px;font-weight:800;letter-spacing:.08em;
+    color:#fff;background:linear-gradient(135deg,#FFB0D9,#B78BFF);
+    box-shadow:0 6px 16px rgba(200,140,225,.36);
+  }
+  .eggText{
+    margin:16px 2px 0;font-size:clamp(16px,4.6vw,19px);line-height:1.85;font-weight:700;
+    letter-spacing:.02em;color:#6E4E82;min-height:3.7em;
+  }
+  .eggMeta{margin:12px 0 0;font-size:11.5px;color:var(--ink-soft);letter-spacing:.04em}
+  .eggOk{
+    margin-top:20px;width:100%;min-height:50px;border:0;border-radius:16px;cursor:pointer;
+    color:#fff;font:800 15px/1 inherit;letter-spacing:.06em;
+    background:linear-gradient(135deg,#FF9ECF,#B58BFF);
+    box-shadow:0 12px 26px rgba(190,140,225,.44);
+    animation:eggBtn 2.6s ease-in-out infinite;touch-action:manipulation;
+  }
+  @keyframes eggBtn{0%,100%{box-shadow:0 12px 26px rgba(190,140,225,.44)}50%{box-shadow:0 16px 34px rgba(255,150,200,.62)}}
+
+  /* 彩蛋列表条目 */
+  li.item.egg .info .a{font-weight:600;color:#7C5A90;line-height:1.6}
+  li.item.egg .catTag{
+    display:block;width:max-content;margin-bottom:5px;padding:2px 9px;border-radius:999px;
+    font-size:10.5px;font-weight:800;letter-spacing:.06em;color:#fff;
+    background:linear-gradient(135deg,#FFB0D9,#B78BFF);
+  }
+  li.item.egg .dot{background:linear-gradient(135deg,#FFD98A,#FF9ECF)}
+
+  /* ---------- 弹窗 ---------- */
+  .mask{
+    position:fixed;inset:0;display:none;place-items:center;z-index:50;
+    background:rgba(120,86,128,.28);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  }
+  .mask.open{display:grid;animation:fade .2s ease}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  .dialog{
+    width:min(88vw,340px);padding:24px 22px 18px;text-align:center;
+    background:linear-gradient(170deg,#FFFDFF,#FFF3FA);
+    border-radius:24px;border:1px solid #fff;
+    box-shadow:0 26px 60px rgba(150,105,175,.35);
+    animation:popIn .3s cubic-bezier(.2,1.5,.4,1) both;
+  }
+  @keyframes popIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:none}}
+  .dialog h3{margin:0 0 10px;font-size:17px}
+  .dialog p{margin:0 0 18px;font-size:13px;color:var(--ink-soft);line-height:1.7}
+  .dialog .btns{display:flex;gap:10px}
+  .dialog .btns button{flex:1;padding:11px 0;border-radius:14px;cursor:pointer;font:700 14px/1 inherit}
+  .dialog .cancel{background:rgba(255,255,255,.9);border:1px solid rgba(226,196,240,.9);color:var(--ink-soft)}
+  .dialog .ok{border:0;color:#fff;background:linear-gradient(135deg,#FF9ECF,#B58BFF);box-shadow:0 8px 20px rgba(200,140,225,.4)}
+
+  /* ---------- 手机竖屏（放在最后，确保覆盖基础样式） ---------- */
+  @media (max-width:860px){
+    .wrap{padding-top:calc(14px + env(safe-area-inset-top))}
+    header{margin-bottom:12px}
+    h1{font-size:clamp(22px,6.2vw,30px)}
+    .sub{font-size:12.5px;margin-top:5px}
+    .panel{grid-template-columns:1fr;gap:14px}
+    /* 瓶子与剩余颗数并排，一眼可见 */
+    .bottle-area{flex-direction:row;align-items:center;justify-content:center;gap:10px;padding:10px 12px 12px}
+    .bottle{width:min(40vw,176px)}
+    .counter{margin-top:0;text-align:right;flex:1 1 auto;min-width:0}
+    .counter .num{font-size:clamp(38px,13vw,54px)}
+    .counter .unit{display:block;margin:2px 0 0;font-size:13px}
+    .counter .total{font-size:11.5px;letter-spacing:.01em}
+    .card{border-radius:22px}
+    .card.pad{padding:15px 14px 13px}
+    .card h2{margin-bottom:12px}
+    .quick button{min-height:44px;font-size:15px}
+    .primary{min-height:50px;flex:0 0 116px}
+    input[type=number]{min-height:50px;font-size:16px}
+    ul.hist{max-height:none}
+    li.item{padding:10px 11px}
+    .undo{min-height:36px;padding:8px 10px}
+    .ghost{min-height:38px;padding:9px 13px}
+    .tip{margin-top:12px}
+  }
+</style>
+</head>
+<body>
+<div class="bokeh" id="bokeh"></div>
+
+<main class="wrap">
+  <header>
+    <h1>✨ 星愿玻璃瓶 ✨</h1>
+    <p class="sub">每一颗小星星，都值得被认真记录</p>
+  </header>
+
+  <div class="panel">
+    <!-- 瓶子 -->
+    <section class="card bottle-area">
+      <svg class="bottle" id="bottle" viewBox="0 0 300 470" role="img" aria-label="装满小星星的玻璃瓶">
+        <defs>
+          <linearGradient id="glassFill" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#FFFFFF" stop-opacity=".62"/>
+            <stop offset="42%" stop-color="#F3E6FF" stop-opacity=".28"/>
+            <stop offset="100%" stop-color="#FFFFFF" stop-opacity=".5"/>
+          </linearGradient>
+          <linearGradient id="glassRim" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#FFFFFF" stop-opacity=".95"/>
+            <stop offset="100%" stop-color="#FFD6EE" stop-opacity=".65"/>
+          </linearGradient>
+          <linearGradient id="corkGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#F8E7C6"/>
+            <stop offset="45%" stop-color="#E4C393"/>
+            <stop offset="100%" stop-color="#C7A06A"/>
+          </linearGradient>
+          <linearGradient id="shineGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0"/>
+            <stop offset="50%" stop-color="#FFFFFF" stop-opacity=".85"/>
+            <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+          </linearGradient>
+          <radialGradient id="starGold" cx="35%" cy="30%" r="78%">
+            <stop offset="0%" stop-color="#FFFCE0"/>
+            <stop offset="45%" stop-color="#FFD25E"/>
+            <stop offset="100%" stop-color="#F29B33"/>
+          </radialGradient>
+          <radialGradient id="starPink" cx="35%" cy="30%" r="78%">
+            <stop offset="0%" stop-color="#FFEDF8"/>
+            <stop offset="45%" stop-color="#FFA8DA"/>
+            <stop offset="100%" stop-color="#F574BE"/>
+          </radialGradient>
+          <radialGradient id="starLilac" cx="35%" cy="30%" r="78%">
+            <stop offset="0%" stop-color="#F6EEFF"/>
+            <stop offset="45%" stop-color="#C6A6FF"/>
+            <stop offset="100%" stop-color="#9575F0"/>
+          </radialGradient>
+          <radialGradient id="starWhite" cx="35%" cy="30%" r="78%">
+            <stop offset="0%" stop-color="#FFFFFF"/>
+            <stop offset="55%" stop-color="#EAF1FF"/>
+            <stop offset="100%" stop-color="#C3D6F7"/>
+          </radialGradient>
+          <radialGradient id="auraGold" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#FFE9A8" stop-opacity=".95"/>
+            <stop offset="55%" stop-color="#FFC46B" stop-opacity=".38"/>
+            <stop offset="100%" stop-color="#FFC46B" stop-opacity="0"/>
+          </radialGradient>
+          <filter id="softGlow" x="-35%" y="-35%" width="170%" height="170%">
+            <feGaussianBlur stdDeviation="3.2" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <clipPath id="bottleClip">
+            <path d="M115 58 L115 128 C115 150 52 165 52 205 L52 385
+                     C52 420 80 448 115 448 L185 448 C220 448 248 420 248 385
+                     L248 205 C248 165 185 150 185 128 L185 58 Z"/>
+          </clipPath>
+          <path id="starShape" d="M0,-10 L2.35,-3.24 L9.51,-3.09 L3.8,1.24 L5.88,8.09 L0,4 L-5.88,8.09 L-3.8,1.24 L-9.51,-3.09 L-2.35,-3.24 Z"/>
+        </defs>
+
+        <!-- 瓶身玻璃底色 -->
+        <path d="M115 58 L115 128 C115 150 52 165 52 205 L52 385
+                 C52 420 80 448 115 448 L185 448 C220 448 248 420 248 385
+                 L248 205 C248 165 185 150 185 128 L185 58 Z"
+              fill="url(#glassFill)" stroke="rgba(210,170,235,.55)" stroke-width="3"/>
+
+        <g clip-path="url(#bottleClip)">
+          <!-- 星星光晕 -->
+          <ellipse id="aura" cx="150" cy="410" rx="98" ry="60" fill="url(#auraGold)" opacity=".4"/>
+          <!-- 星星辉光层 -->
+          <g id="glowLayer" filter="url(#softGlow)"></g>
+          <!-- 星群（一颗星一个元素，1:1 对应数量） -->
+          <g id="stars"></g>
+          <!-- 底部反光 -->
+          <ellipse cx="150" cy="452" rx="86" ry="16" fill="#FFFFFF" opacity=".35"/>
+        </g>
+
+        <!-- 玻璃高光 -->
+        <path d="M78 210 C74 260 72 320 80 372" fill="none" stroke="#FFFFFF" stroke-width="3.4" stroke-linecap="round" opacity=".7"/>
+        <path d="M226 224 C232 268 232 320 224 366" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" opacity=".35"/>
+        <ellipse cx="92" cy="300" rx="13" ry="118" fill="url(#shineGrad)" opacity=".38" transform="rotate(-5 92 300)"/>
+        <!-- 瓶身轮廓提亮 -->
+        <path d="M115 58 L115 128 C115 150 52 165 52 205 L52 385
+                 C52 420 80 448 115 448 L185 448 C220 448 248 420 248 385
+                 L248 205 C248 165 185 150 185 128 L185 58"
+              fill="none" stroke="rgba(255,255,255,.9)" stroke-width="2.4" stroke-linejoin="round"/>
+
+        <!-- 瓶口与木塞 -->
+        <rect x="106" y="46" width="88" height="20" rx="10" fill="url(#glassRim)" stroke="rgba(226,190,248,.8)" stroke-width="1.6"/>
+        <rect x="113" y="14" width="74" height="36" rx="10" fill="url(#corkGrad)" stroke="rgba(160,120,70,.35)" stroke-width="1.2"/>
+        <ellipse cx="150" cy="15" rx="37" ry="7" fill="#FBEED3" opacity=".9"/>
+        <path d="M120 26 L180 26" stroke="#FFF7E4" stroke-width="2" opacity=".55" stroke-linecap="round"/>
+
+        <!-- 吊牌 -->
+        <g transform="translate(212,150) rotate(14)">
+          <path d="M0 0 L0 44" stroke="#D9B8FF" stroke-width="1.6"/>
+          <rect x="-26" y="10" width="56" height="32" rx="8" fill="rgba(255,255,255,.92)" stroke="rgba(255,190,226,.9)" stroke-width="1.4"/>
+          <text x="2" y="24" font-size="11" text-anchor="middle" fill="#A8559A" font-family="inherit" font-weight="700">星愿瓶</text>
+          <text x="2" y="36" font-size="9" text-anchor="middle" fill="#B79BD0" font-family="inherit">keep sparkling</text>
+        </g>
+
+        <!-- 闪片 -->
+        <g id="sparks"></g>
+      </svg>
+
+      <div class="counter" id="counter">
+        <span class="num" id="remainNum">600</span><span class="unit">颗</span>
+        <div class="total">瓶中共 <span id="totalNum">600</span> 颗 · 已取走 <span id="takenNum">0</span> 颗</div>
+      </div>
+    </section>
+
+    <!-- 操作区 -->
+    <section class="side">
+      <div class="card pad">
+        <h2>取走小星星</h2>
+        <div class="quick" id="quick">
+          <button data-amt="1">1 颗</button>
+          <button data-amt="5">5 颗</button>
+          <button data-amt="10">10 颗</button>
+          <button data-amt="20">20 颗</button>
+        </div>
+        <div class="row">
+          <input type="number" id="amount" min="1" placeholder="输入数量" inputmode="numeric">
+          <button class="primary" id="takeBtn">取走 ✦</button>
+        </div>
+        <p class="hint" id="hint">愿你取走的每一颗，都变成好运气</p>
+        <p class="eggNote">每取走一次，就会打开一颗星星里的彩蛋 ✧</p>
+      </div>
+
+      <div class="card pad">
+        <div class="histHead">
+          <h2 style="margin-bottom:0">我的记录</h2>
+        </div>
+        <div class="tabs" id="tabs">
+          <button class="tab on" data-list="take">取星记录<i id="tabTake"></i></button>
+          <button class="tab" data-list="egg">彩蛋记录<i id="tabEgg"></i></button>
+        </div>
+        <ul class="hist" id="hist"></ul>
+        <ul class="hist" id="eggList" hidden></ul>
+        <div class="footRow">
+          <button class="ghost" id="exportBtn">导出备份</button>
+          <button class="ghost" id="importBtn">恢复备份</button>
+          <button class="ghost" id="resetBtn">重置瓶子</button>
+        </div>
+        <input type="file" id="fileInput" accept="application/json,.json" hidden>
+      </div>
+    </section>
+  </div>
+
+  <p class="tip">
+    <span class="onlyMobile">小提示：在手机浏览器菜单里选择「<b>添加到主屏幕</b>」，之后就能像 App 一样一键打开 ✧ 记录自动存在本机</span>
+    <span class="onlyDesktop">小提示：数据自动保存在本机浏览器里；换设备时用「导出备份 / 恢复备份」即可搬运记录 ✧</span>
+  </p>
+</main>
+
+<div class="eggMask" id="eggMask">
+  <div class="eggCard">
+    <div class="eggHalo" aria-hidden="true">
+      <svg viewBox="-50 -50 100 100" class="eggStar">
+        <use href="#starShape" fill="url(#starGold)" transform="scale(3.4)" filter="url(#softGlow)"/>
+      </svg>
+    </div>
+    <p class="eggTop">你打开了一颗星星的彩蛋</p>
+    <span class="eggCat" id="eggCat">给你打气</span>
+    <p class="eggText" id="eggText"></p>
+    <p class="eggMeta" id="eggMeta"></p>
+    <button class="eggOk" id="eggOk">收下这份好运 ✧</button>
+  </div>
+</div>
+
+<div class="mask" id="mask">
+  <div class="dialog">
+    <h3 id="dgTitle">重置瓶子？</h3>
+    <p id="dgText">瓶子会重新装满 600 颗星星，过往的取走记录也会一并清空哦。</p>
+    <div class="btns">
+      <button class="cancel" id="dgCancel">再想想</button>
+      <button class="ok" id="dgOk">确认重置</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ========== 数据层 ========== */
+  const STORE_KEY = "star-bottle-v1";
+  const TOTAL = 600;
+
+  function load(){
+    try{
+      const raw = localStorage.getItem(STORE_KEY);
+      if(!raw) return null;
+      const d = JSON.parse(raw);
+      if(!d || !Array.isArray(d.history)) return null;
+      return {
+        total: TOTAL,
+        history: d.history.filter(e => e && typeof e.amount === "number"),
+        eggs: Array.isArray(d.eggs) ? d.eggs.filter(e => e && typeof e.text === "string") : []
+      };
+    }catch(e){ return null; }
+  }
+  function save(){
+    try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){}
+  }
+
+  let state = load() || { total: TOTAL, history: [], eggs: [] };
+
+  function takenTotal(){ return state.history.reduce((s,e)=> s + e.amount, 0); }
+  function remaining(){ return Math.max(0, state.total - takenTotal()); }
+
+  /* ========== 星星彩蛋：每取走一次，就打开一颗星星里的悄悄话 ========== */
+  const EGGS_HEART = [
+    "你已经比昨天更靠近想要的生活了。",
+    "星星记得你每一次没有放弃的时刻。",
+    "今天的你，值得被认认真真夸一遍。",
+    "慢慢来，你的节奏刚刚好。",
+    "不用急着变成别人，你本来的样子就很亮。",
+    "你扛过来的那些事，比你以为的要多得多。",
+    "允许自己休息，也是一种本事。",
+    "你不需要一直坚强，脆弱的时候也有人愿意接住你。",
+    "你已经做得很好了，真的。",
+    "那些没被别人看见的努力，都算数。",
+    "今天的烦恼，交给明天的星星去处理。",
+    "你不是在原地打转，你是在悄悄扎根。",
+    "你的温柔和认真，是很好的东西。",
+    "想哭就哭吧，眼泪也会变成星星。",
+    "你现在拥有的一切，都是自己一点一点攒起来的。",
+    "别怕走得慢，只怕停下来责备自己。",
+    "你值得一个不慌张的夜晚。",
+    "你不是不够好，你只是太久没被好好夸过了。",
+    "星星从来不催人，它只是陪着你。",
+    "今天也谢谢你，好好地活着。",
+    "你的存在本身，就是一件很好的事。",
+    "把“我应该”换成“我想”，试着过一天。",
+    "你不需要向任何人证明自己。",
+    "明天也会有新的星星落进你的瓶子里。"
+  ];
+  const EGGS_SELF = [
+    "认真洗个热水澡，把今天的不开心冲掉。",
+    "今天早点睡，把手机放远一点。",
+    "给自己泡一杯热饮，捧着它发一会儿呆。",
+    "挑一首最爱的歌，戴上耳机完整听完。",
+    "给自己十分钟，什么都不做，就躺着。",
+    "换上最喜欢的那件睡衣，舒服最重要。",
+    "把桌面收拾出一小块干干净净的地方。",
+    "出门看看天，哪怕只在楼下走五分钟。",
+    "给自己写一句夸奖，贴在能看见的地方。",
+    "把那个让你不舒服的对话框，安静地放下。",
+    "今天不勉强自己社交，独处也很好。",
+    "认真地抱一下自己，久一点的那种。",
+    "允许自己看一集毫无营养的剧。",
+    "给自己订一束花，不用等任何节日。",
+    "今天少看一次别人的生活，多看一次自己的。",
+    "对着镜子说一句：我最近，辛苦了。",
+    "把想做的事写下来，先写，不必马上做。",
+    "留一个周末，什么都不安排。",
+    "做一次长长的深呼吸，慢慢地数到十。",
+    "给自己留一点“看起来没什么用”的时间。",
+    "点一份最想吃的宵夜，不要再纠结。",
+    "把窗户打开，让风和新空气进来。",
+    "今天穿让自己开心的衣服，哪怕只在家。",
+    "睡前摸摸自己的手，跟它说一声辛苦了。"
+  ];
+  const EGGS_GIFT = [
+    "给自己买一杯惦记了很久的饮品。",
+    "收藏夹里的那本书，今天下单吧。",
+    "买一支好看的颜色，取悦一下自己。",
+    "买个小摆件，放在每天都能看见的地方。",
+    "给自己加一份甜点，不需要任何理由。",
+    "买一双特别舒服的袜子，脚知道你的好。",
+    "换一个喜欢的手机壁纸，每天都看见。",
+    "买一罐好闻的香薰，让房间有自己的味道。",
+    "给自己订一个小蛋糕，插上一根蜡烛。",
+    "买一张想去的地方的票，先买近的那一段。",
+    "那件舍不得买的衣服，这次带它回家。",
+    "买一盒喜欢的巧克力，慢慢吃，不用一次吃完。",
+    "换一个舒服的枕头，让睡眠好一点。",
+    "买副耳机，把世界调成自己喜欢的音量。",
+    "奖励自己一次按摩，让身体松下来。",
+    "买一份拼图或小积木，安心地拼一个晚上。",
+    "买一双好走路的鞋，陪你去更远的地方。",
+    "挑一个喜欢的小杯子，连喝水都变开心。",
+    "买张电影票，坐在最后一排，随便哭随便笑。",
+    "给自己买一张想看的展的票。",
+    "买条软软的小毯子，冷的时候裹住自己。",
+    "给手机换个可爱的壳，每天摸到都高兴。",
+    "买一小罐喜欢的茶或咖啡豆，慢慢喝。",
+    "送自己一件“没什么用但很喜欢”的东西。"
+  ];
+  const EGG_CATS = ["给你打气", "宠爱自己", "小小奖励"];
+  const EGGS = EGGS_HEART.map(t => ({ c:0, t:t }))
+    .concat(EGGS_SELF.map(t => ({ c:1, t:t })), EGGS_GIFT.map(t => ({ c:2, t:t })));
+
+  let eggBag = [];
+  function drawEgg(){
+    if(eggBag.length === 0){
+      eggBag = EGGS.map(function(_, i){ return i; });   // 洗牌抽取：一轮之内不重复
+      for(let i = eggBag.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i + 1));
+        const tmp = eggBag[i]; eggBag[i] = eggBag[j]; eggBag[j] = tmp;
+      }
+    }
+    return EGGS[eggBag.pop()];
+  }
+
+  /* ========== 星星槽位（固定布局，位置稳定） ========== */
+  function mulberry32(a){
+    return function(){
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      let t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  const GRAD = ["starGold","starGold","starGold","starPink","starPink","starLilac","starWhite"];
+
+  function buildSlots(){
+    const rnd = mulberry32(20261019);
+    const slots = [];
+    const cols = 14, rows = 43;               // 14×43 ≈ 602 个槽位，取底部 600 个
+    const x0 = 66, x1 = 234, yTop = 170, yBottom = 436;
+    for(let r = 0; r < rows; r++){
+      for(let c = 0; c < cols; c++){
+        let x = x0 + (c + 0.5) * ((x1 - x0) / cols) + (rnd() - 0.5) * 7;
+        const y = yBottom - (r + 0.5) * ((yBottom - yTop) / rows) + (rnd() - 0.5) * 5;
+        // 越靠上越收窄，贴合瓶肩曲线
+        const t = Math.min(1, Math.max(0, (240 - y) / 86));
+        x = 150 + (x - 150) * (1 - 0.4 * t * t);
+        slots.push({
+          x: x, y: y,
+          rot: rnd() * 72,
+          s: 0.30 + rnd() * 0.27,
+          g: GRAD[Math.floor(rnd() * GRAD.length)],
+          op: 0.76 + rnd() * 0.24,
+          glow: rnd() < 0.22,
+          twk: rnd() < 0.14,
+          dur: (2.2 + rnd() * 2.8).toFixed(2),
+          delay: (rnd() * 3).toFixed(2)
+        });
+      }
+    }
+    slots.sort((a,b)=> (b.y - a.y) || (a.x - b.x)); // 从瓶底往上装
+    return slots.slice(0, TOTAL);                   // 1 颗星星 = 1 个槽位
+  }
+  const SLOTS = buildSlots();
+
+  /* ========== 渲染 ========== */
+  const el = {
+    stars: document.getElementById("stars"),
+    glowLayer: document.getElementById("glowLayer"),
+    aura: document.getElementById("aura"),
+    sparks: document.getElementById("sparks"),
+    bottle: document.getElementById("bottle"),
+    remainNum: document.getElementById("remainNum"),
+    totalNum: document.getElementById("totalNum"),
+    takenNum: document.getElementById("takenNum"),
+    counter: document.getElementById("counter"),
+    amount: document.getElementById("amount"),
+    quick: document.getElementById("quick"),
+    takeBtn: document.getElementById("takeBtn"),
+    hint: document.getElementById("hint"),
+    hist: document.getElementById("hist"),
+    eggList: document.getElementById("eggList"),
+    tabs: document.getElementById("tabs"),
+    tabTake: document.getElementById("tabTake"),
+    tabEgg: document.getElementById("tabEgg"),
+    eggMask: document.getElementById("eggMask"),
+    eggCat: document.getElementById("eggCat"),
+    eggText: document.getElementById("eggText"),
+    eggMeta: document.getElementById("eggMeta"),
+    eggOk: document.getElementById("eggOk"),
+    fileInput: document.getElementById("fileInput"),
+    dgTitle: document.getElementById("dgTitle"),
+    dgText: document.getElementById("dgText"),
+    dgOk: document.getElementById("dgOk"),
+    dgCancel: document.getElementById("dgCancel"),
+    mask: document.getElementById("mask")
+  };
+
+  function renderStars(ratio){
+    const visible = remaining() <= 0 ? 0 : Math.max(1, Math.round(ratio * SLOTS.length));
+    let glowBuf = "", starBuf = "";
+    for(let i = 0; i < visible; i++){
+      const s = SLOTS[i];
+      const tr = "translate(" + s.x.toFixed(1) + "," + s.y.toFixed(1) + ") rotate("
+               + s.rot.toFixed(1) + ") scale(" + s.s.toFixed(2) + ")";
+      if(s.glow){
+        glowBuf += '<use href="#starShape" fill="url(#' + s.g + ')" transform="' + tr + '" opacity=".8"/>';
+      }
+      starBuf += '<use href="#starShape" fill="url(#' + s.g + ')" opacity="' + s.op.toFixed(2)
+               + '" transform="' + tr + '"'
+               + (s.twk ? ' class="star" style="animation-duration:' + s.dur + 's;animation-delay:-'
+                          + s.delay + 's"' : '') + '/>';
+    }
+    el.stars.innerHTML = starBuf;
+    el.glowLayer.innerHTML = glowBuf;
+
+    // 光晕随星量收缩
+    const fillTop = 436 - ratio * (436 - 170);
+    el.aura.setAttribute("cy", ((436 + fillTop) / 2).toFixed(1));
+    el.aura.setAttribute("ry", ((436 - fillTop) / 2 + 26).toFixed(1));
+    el.aura.setAttribute("opacity", (0.16 + 0.5 * ratio).toFixed(2));
+  }
+
+  function buildSparks(){
+    const rnd = mulberry32(771);
+    let buf = "";
+    const spots = [
+      [150,120],[62,236],[240,250],[96,410],[206,404],[150,448],
+      [58,330],[243,336],[112,168],[196,176]
+    ];
+    spots.forEach(function(p, i){
+      const sc = (0.5 + rnd() * 0.75).toFixed(2);
+      buf += '<g transform="translate(' + p[0] + ',' + p[1] + ') rotate(' + (rnd()*45).toFixed(1) + ')">'
+           + '<path class="spark" d="M0,-13 L2.6,-2.6 L13,0 L2.6,2.6 L0,13 L-2.6,2.6 L-13,0 L-2.6,-2.6 Z"'
+           + ' fill="#FFFFFF" style="transform-box:fill-box;transform-origin:center;animation:spark '
+           + (2.6 + rnd()*3).toFixed(2) + 's ease-in-out infinite;animation-delay:' + (-rnd()*4).toFixed(2)
+           + 's;transform:scale(' + sc + ')"/></g>';
+    });
+    el.sparks.innerHTML = buf;
+  }
+
+  function fmtTime(ts){
+    const d = new Date(ts);
+    const p = n => String(n).padStart(2, "0");
+    return d.getFullYear() + "-" + p(d.getMonth()+1) + "-" + p(d.getDate())
+         + " " + p(d.getHours()) + ":" + p(d.getMinutes());
+  }
+
+  function esc(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"}[c];
+    });
+  }
+
+  function renderInfo(){
+    const rem = remaining();
+    el.remainNum.textContent = rem;
+    el.totalNum.textContent = state.total;
+    el.takenNum.textContent = takenTotal();
+
+    el.amount.max = rem || 0;
+    if(rem <= 0){
+      el.amount.disabled = true;
+      el.takeBtn.disabled = true;
+      el.hint.textContent = "瓶子空啦 ✧ 星星都去到它们该去的地方了";
+      el.hint.classList.add("warn");
+    }else{
+      el.amount.disabled = false;
+      el.takeBtn.disabled = false;
+      if(!el.hint.classList.contains("warn") || el.hint.dataset.locked !== "1"){
+        el.hint.classList.remove("warn");
+        el.hint.textContent = "愿你取走的每一颗，都变成好运气";
+        el.hint.dataset.locked = "0";
+      }
+    }
+  }
+
+  function renderHistory(){
+    const n = state.history.length;
+    el.tabTake.textContent = n ? n : "";
+    if(n === 0){
+      el.hist.innerHTML = '<li class="empty">还没有取走过小星星 ✧</li>';
+      return;
+    }
+    // 按时间正序重算“取走后剩余”
+    let run = state.total, map = {};
+    state.history.slice().sort((a,b)=> a.ts - b.ts).forEach(function(e){
+      run = Math.max(0, run - e.amount);
+      map[e.id] = run;
+    });
+    let buf = "";
+    state.history.slice().sort((a,b)=> b.ts - a.ts).forEach(function(e){
+      buf += '<li class="item">'
+           + '<span class="dot"></span>'
+           + '<span class="info"><span class="t">' + fmtTime(e.ts) + '</span>'
+           + '<div class="a">取走 <b>' + e.amount + '</b> 颗 · 剩余 ' + map[e.id] + ' 颗</div></span>'
+           + '<button class="undo" data-id="' + e.id + '">撤销</button>'
+           + '</li>';
+    });
+    el.hist.innerHTML = buf;
+  }
+
+  /* ---------- 彩蛋记录 ---------- */
+  function renderEggs(){
+    const list = state.eggs;
+    el.tabEgg.textContent = list.length ? list.length : "";
+    if(list.length === 0){
+      el.eggList.innerHTML = '<li class="empty">取走一颗星星，就会打开一个彩蛋 ✧</li>';
+      return;
+    }
+    let buf = "";
+    list.slice().sort((a,b)=> b.ts - a.ts).forEach(function(e){
+      buf += '<li class="item egg">'
+           + '<span class="dot"></span>'
+           + '<span class="info">'
+           + '<span class="catTag">' + EGG_CATS[e.c] + '</span>'
+           + '<span class="t">' + fmtTime(e.ts) + ' · 取走 ' + e.amount + ' 颗</span>'
+           + '<div class="a">' + esc(e.t) + '</div>'
+           + '</span>'
+           + '</li>';
+    });
+    el.eggList.innerHTML = buf;
+  }
+
+  /* ---------- 彩蛋弹层 ---------- */
+  function openEgg(egg, amount){
+    el.eggCat.textContent = EGG_CATS[egg.c];
+    el.eggText.textContent = egg.t;
+    el.eggMeta.textContent = fmtTime(Date.now()) + " · 取走 " + amount + " 颗";
+    el.eggMask.classList.add("open");
+  }
+  el.eggOk.addEventListener("click", function(){
+    el.eggMask.classList.remove("open");
+  });
+  el.eggMask.addEventListener("click", function(ev){
+    if(ev.target === el.eggMask) el.eggMask.classList.remove("open");
+  });
+
+  /* ---------- 记录分类切换 ---------- */
+  el.tabs.addEventListener("click", function(ev){
+    const b = ev.target.closest(".tab");
+    if(!b) return;
+    Array.prototype.forEach.call(el.tabs.children, c => c.classList.remove("on"));
+    b.classList.add("on");
+    const isEgg = b.dataset.list === "egg";
+    el.eggList.hidden = !isEgg;
+    el.hist.hidden = isEgg;
+  });
+
+  function renderAll(withPop){
+    const ratio = state.total ? remaining() / state.total : 0;
+    renderStars(ratio);
+    renderInfo();
+    renderHistory();
+    renderEggs();
+    if(withPop){
+      el.remainNum.classList.remove("pop");
+      void el.remainNum.offsetWidth;
+      el.remainNum.classList.add("pop");
+    }
+  }
+
+  /* ========== 交互 ========== */
+  function shake(){
+    el.bottle.classList.remove("wobble");
+    void el.bottle.offsetWidth;
+    el.bottle.classList.add("wobble");
+  }
+  function flyTip(n){
+    const t = document.createElement("div");
+    t.className = "floatTip";
+    t.textContent = "−" + n + " ✧";
+    el.counter.appendChild(t);
+    setTimeout(function(){ t.remove(); }, 1200);
+  }
+
+  function clearQuick(){
+    Array.prototype.forEach.call(el.quick.children, function(c){ c.classList.remove("on"); });
+  }
+
+  function takeOut(n){
+    const rem = remaining();
+    if(!Number.isFinite(n) || n <= 0 || n % 1 !== 0){
+      el.hint.textContent = "请输入一个正整数颗数呀～";
+      el.hint.classList.add("warn");
+      el.hint.dataset.locked = "1";
+      return;
+    }
+    if(n > rem){
+      el.hint.textContent = "瓶里只剩 " + rem + " 颗啦，不能取走更多";
+      el.hint.classList.add("warn");
+      el.hint.dataset.locked = "1";
+      return;
+    }
+    const egg = drawEgg();
+    const ts = Date.now();
+    const base = ts + "_" + Math.floor(Math.random()*10000);
+    state.history.push({ id: "s" + base, ts: ts, amount: n });
+    state.eggs.push({ id: "e" + base, ts: ts, c: egg.c, t: egg.t, amount: n });
+    save();
+    el.amount.value = "";
+    clearQuick();
+    el.hint.classList.remove("warn");
+    el.hint.dataset.locked = "0";
+    el.hint.textContent = "已取走 " + n + " 颗 ✧ 彩蛋已存进「彩蛋记录」";
+    renderAll(true);
+    shake();
+    flyTip(n);
+    openEgg(egg, n);
+  }
+
+  function undo(id){
+    const i = state.history.findIndex(function(e){ return e.id === id; });
+    if(i < 0) return;
+    const n = state.history[i].amount;
+    state.history.splice(i, 1);
+    state.eggs = state.eggs.filter(function(e){ return e.id !== id.replace(/^s/, "e"); });
+    save();
+    clearQuick();
+    el.hint.classList.remove("warn");
+    el.hint.dataset.locked = "0";
+    el.hint.textContent = "已把 " + n + " 颗小星星放回瓶子里 ✧";
+    renderAll(true);
+    shake();
+  }
+
+  el.quick.addEventListener("click", function(ev){
+    const b = ev.target.closest("button[data-amt]");
+    if(!b) return;
+    Array.prototype.forEach.call(el.quick.children, c => c.classList.remove("on"));
+    b.classList.add("on");
+    el.amount.value = b.dataset.amt;
+    el.hint.classList.remove("warn");
+    el.hint.dataset.locked = "0";
+    el.hint.textContent = "准备取走 " + b.dataset.amt + " 颗小星星";
+  });
+
+  el.takeBtn.addEventListener("click", function(){
+    takeOut(parseInt(el.amount.value, 10));
+  });
+  el.amount.addEventListener("keydown", function(e){
+    if(e.key === "Enter") takeOut(parseInt(el.amount.value, 10));
+  });
+  el.amount.addEventListener("input", function(){
+    Array.prototype.forEach.call(el.quick.children, c => c.classList.remove("on"));
+    if(el.hint.dataset.locked === "1"){
+      el.hint.classList.remove("warn");
+      el.hint.dataset.locked = "0";
+      el.hint.textContent = "愿你取走的每一颗，都变成好运气";
+    }
+  });
+
+  el.hist.addEventListener("click", function(ev){
+    const b = ev.target.closest(".undo");
+    if(b) undo(b.dataset.id);
+  });
+
+  el.takeBtn.addEventListener("animationend", function(){ el.takeBtn.disabled = false; });
+
+  document.getElementById("resetBtn").addEventListener("click", function(){
+    showConfirm("重置瓶子？", "瓶子会重新装满 " + TOTAL + " 颗星星，过往的取星记录和彩蛋记录也会一并清空哦。", "确认重置", function(){
+      state = { total: TOTAL, history: [], eggs: [] };
+      save();
+      el.amount.value = "";
+      clearQuick();
+      el.hint.classList.remove("warn");
+      el.hint.dataset.locked = "0";
+      el.hint.textContent = "瓶子重新装满啦 ✧ 一共 " + TOTAL + " 颗小星星";
+      renderAll(true);
+      shake();
+    });
+  });
+
+  document.getElementById("exportBtn").addEventListener("click", function(){
+    const d = new Date();
+    const p = n => String(n).padStart(2, "0");
+    const payload = {
+      app: "star-bottle", version: 2, exportedAt: d.getTime(),
+      total: state.total, history: state.history, eggs: state.eggs
+    };
+    const name = "星愿瓶备份-" + d.getFullYear() + p(d.getMonth()+1) + p(d.getDate())
+               + "-" + p(d.getHours()) + p(d.getMinutes()) + ".json";
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
+    el.hint.classList.remove("warn");
+    el.hint.dataset.locked = "0";
+    el.hint.textContent = "备份已导出 ✧ 请保存好这个文件";
+  });
+
+  document.getElementById("importBtn").addEventListener("click", function(){
+    el.fileInput.value = "";
+    el.fileInput.click();
+  });
+  el.fileInput.addEventListener("change", function(){
+    const f = el.fileInput.files && el.fileInput.files[0];
+    if(f) importBackup(f);
+  });
+
+  function importBackup(file){
+    const reader = new FileReader();
+    reader.onload = function(){
+      let clean = null, eggs = [];
+      try{
+        const d = JSON.parse(String(reader.result));
+        const list = Array.isArray(d) ? d : (d && Array.isArray(d.history) ? d.history : null);
+        if(!list) throw new Error("bad-format");
+        clean = list.filter(function(e){
+          return e && typeof e.amount === "number" && isFinite(e.amount)
+                 && e.amount >= 1 && typeof e.ts === "number" && isFinite(e.ts);
+        }).map(function(e, i){
+          return {
+            id: typeof e.id === "string" ? e.id : "im" + Date.now() + "_" + i,
+            ts: e.ts,
+            amount: Math.round(e.amount)
+          };
+        });
+        if(d && Array.isArray(d.eggs)){
+          eggs = d.eggs.filter(function(e){
+            return e && (typeof e.t === "string" || typeof e.text === "string")
+                   && typeof e.ts === "number" && isFinite(e.ts);
+          }).map(function(e, i){
+            return {
+              id: typeof e.id === "string" ? e.id : "ie" + Date.now() + "_" + i,
+              ts: e.ts,
+              c: e.c === 1 || e.c === 2 ? e.c : 0,
+              t: typeof e.t === "string" ? e.t : e.text,
+              amount: Math.round(Number(e.amount) || 0)
+            };
+          });
+        }
+      }catch(err){ clean = null; }
+
+      if(!clean){
+        el.hint.classList.add("warn");
+        el.hint.dataset.locked = "1";
+        el.hint.textContent = "这个文件读不出来呀，请选择本应用「导出备份」生成的文件";
+        return;
+      }
+      const n = clean.length, m = eggs.length;
+      showConfirm("恢复这份备份？", n === 0 && m === 0
+        ? "这份备份里没有任何记录，恢复后瓶子会回到 " + TOTAL + " 颗满瓶状态。"
+        : "将用备份里的 " + n + " 条取星记录、" + m + " 个彩蛋替换当前记录，当前记录会被覆盖。",
+        "确认恢复", function(){
+          state = { total: TOTAL, history: clean, eggs: eggs };
+          save();
+          el.hint.classList.remove("warn");
+          el.hint.dataset.locked = "0";
+          el.hint.textContent = n === 0 && m === 0
+            ? "已恢复：瓶子满瓶 600 颗 ✧"
+            : "已恢复 " + n + " 条记录、" + m + " 个彩蛋 ✧";
+          renderAll(true);
+          shake();
+        });
+    };
+    reader.onerror = function(){
+      el.hint.classList.add("warn");
+      el.hint.dataset.locked = "1";
+      el.hint.textContent = "文件读取失败，请再试一次";
+    };
+    reader.readAsText(file);
+  }
+
+  /* ---------- 通用确认弹窗 ---------- */
+  let confirmAction = null;
+  function showConfirm(title, text, okText, onOk){
+    el.dgTitle.textContent = title;
+    el.dgText.textContent = text;
+    el.dgOk.textContent = okText;
+    confirmAction = onOk;
+    el.mask.classList.add("open");
+  }
+  function closeConfirm(){
+    el.mask.classList.remove("open");
+    confirmAction = null;
+  }
+  el.dgCancel.addEventListener("click", closeConfirm);
+  el.dgOk.addEventListener("click", function(){
+    const fn = confirmAction;
+    closeConfirm();
+    if(fn) fn();
+  });
+  el.mask.addEventListener("click", function(ev){
+    if(ev.target === el.mask) closeConfirm();
+  });
+
+  /* ========== 背景光斑 ========== */
+  (function(){
+    const rnd = mulberry32(2024);
+    let buf = "";
+    for(let i = 0; i < 14; i++){
+      const sz = 40 + rnd() * 130;
+      buf += '<i style="width:' + sz.toFixed(0) + 'px;height:' + sz.toFixed(0) + 'px;left:'
+           + (rnd()*100).toFixed(1) + '%;top:' + (rnd()*100).toFixed(1) + '%;animation-duration:'
+           + (12 + rnd()*12).toFixed(1) + 's;animation-delay:-' + (rnd()*10).toFixed(1)
+           + 's;opacity:' + (0.25 + rnd()*0.4).toFixed(2) + '"></i>';
+    }
+    document.getElementById("bokeh").innerHTML = buf;
+  })();
+
+  /* ========== 启动 ========== */
+  buildSparks();
+  renderAll(false);
+})();
+</script>
+</body>
+</html>
